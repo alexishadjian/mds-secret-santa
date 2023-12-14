@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
+//Create a user
 exports.userRegister = async (req,res) => {
 
     try {
@@ -15,6 +16,7 @@ exports.userRegister = async (req,res) => {
 
 }
 
+//Check logins and return token
 exports.userLogin = async (req,res) => {
     try {
         const user = await User.findOne({email: req.body.email});
@@ -44,6 +46,7 @@ exports.userLogin = async (req,res) => {
     }
 }
 
+//Change user informations
 exports.userUpdate = async (req,res) => {
 
     try {
@@ -58,6 +61,7 @@ exports.userUpdate = async (req,res) => {
 
 }
 
+//Delete a user
 exports.userDelete = async (req, res) => {
     
     try {
@@ -72,3 +76,15 @@ exports.userDelete = async (req, res) => {
     }
 
 }
+
+//Get user informations
+exports.getUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.user_id);        
+        res.status(200);
+        res.json(user);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message: 'Erreur serveur'});
+    }
+};

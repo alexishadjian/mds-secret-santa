@@ -17,6 +17,7 @@ router
 router
     .route('/:user_id')
     .all(jwtMiddleWare.verifyToken)
+    .get(userController.getUser)
     .put(userController.userUpdate)
     .delete(userController.userDelete)
 
