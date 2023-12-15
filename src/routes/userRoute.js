@@ -9,7 +9,6 @@ router
     .route('/register')
     .post(userController.userRegister)
 
-
 router
     .route('/login')
     .post(userController.userLogin)
