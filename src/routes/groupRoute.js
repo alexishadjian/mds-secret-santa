@@ -29,6 +29,10 @@ router
     .route('/:user_id/groups/:group_id/accept')
     .post(jwtMiddleWare.verifiyTokenInvitation, groupController.acceptInvitation)
 
+router
+    .route('/groups/:group_id/start')
+    .post(groupController.startSanta)
+
 // router
 //     .route(':user_id/group/decline')
 //     .put(groupController.userUpdate)
