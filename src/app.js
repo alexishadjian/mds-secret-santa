@@ -9,8 +9,10 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 const userRoute = require('./routes/userRoute');
+const groupRoute = require('./routes/groupRoute');
 
 app.use('/users', userRoute);
+app.use('/', groupRoute);
 
 
 app.listen(port, () => {
