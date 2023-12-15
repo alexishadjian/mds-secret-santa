@@ -19,7 +19,11 @@ let userSchema = new Schema (
         password: {
             type: String,
             required: true,
-        }
+        },
+        groups: [{ 
+            type: Schema.Types.ObjectId,
+            ref: 'Group' 
+        }]
     },
     { timestamps: true }
 );
