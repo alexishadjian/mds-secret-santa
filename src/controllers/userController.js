@@ -7,6 +7,13 @@ exports.userRegister = async (req,res) => {
 
     try {
         let newUser = new User(req.body);
+
+        //Check if email is already used
+        const mail = await User.findOne({ email: req.body.email });
+        if (mail) {
+            return res.status(500).json({ message: 'Cette adresse mail est déjà utilisée' });
+        }
+
         let user = await newUser.save();
         res.status(201).json({message: `Utilisateur crée: ${user.email}`})
     } catch (error) {
@@ -51,6 +58,12 @@ exports.userUpdate = async (req,res) => {
 
     try {
         const user = await User.findByIdAndUpdate(req.params.user_id, req.body, {new: true});
+
+        //Check if user exist
+        if (!user) {
+            return res.status(500).json({ message: 'Utilisateur introuvable' });
+        }
+        
         res.status(200);
         res.json(user);
     } catch (error) {
@@ -65,7 +78,13 @@ exports.userUpdate = async (req,res) => {
 exports.userDelete = async (req, res) => {
     
     try {
-        await User.findByIdAndDelete(req.params.user_id);
+        const user = await User.findByIdAndDelete(req.params.user_id);
+
+        //Check if user exist
+        if (!user) {
+            return res.status(500).json({ message: 'Utilisateur introuvable' });
+        }
+
         res.status(200);
         res.json({message: 'Utilisateur supprimé'});
 
@@ -80,7 +99,13 @@ exports.userDelete = async (req, res) => {
 //Get user informations
 exports.getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.user_id);        
+        const user = await User.findById(req.params.user_id);
+        
+        //Check if user exist
+        if (!user) {
+            return res.status(500).json({ message: 'Utilisateur introuvable' });
+        }
+
         res.status(200);
         res.json(user);
     } catch (error) {

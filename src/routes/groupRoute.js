@@ -6,17 +6,21 @@ const jwtMiddleWare = require('../middlewares/jwtMiddleware');
 
 
 router
-    .route('/:user_id/group')
+    .route('/:user_id/groups')
     .post(groupController.createAGroup)
 
 router
-    .route('/:user_id/group/:group_id')
+    .route('/:user_id/groups/:group_id')
     .delete(groupController.deleteAGroup)
     .put(groupController.updateAGroup)
 
 router
-    .route('/group/:group_id')
+    .route('/groups/:group_id')
     .get(groupController.getAGroup)
+
+router
+    .route('/:user_id/groups/:group_id/invite')
+    .post(groupController.sendInvitation)
 
 // router
 //     .route('/:user_id/group/invite')

@@ -5,6 +5,11 @@ const User = require('../models/userModel');
 exports.createAGroup = async (req, res) => {
     try {
         const user = await User.findById(req.params.user_id);
+
+        //Check if user exist
+        if (!user) {
+            return res.status(500).json({ message: 'Utilisateur introuvable' });
+        }
         
         const newGroup = new Group({
             ...req.body,
@@ -30,6 +35,11 @@ exports.getAGroup = async (req, res) => {
     try {
         const group = await Group.findById(req.params.group_id);
 
+        //Check if group exist
+        if (!group) {
+            return res.status(500).json({ message: 'Groupe introuvable' });
+        }
+
         if (group) {
             res.status(200);
             res.json(group);
@@ -50,7 +60,18 @@ exports.updateAGroup = async (req, res) => {
 
     try {
         const group = await Group.findByIdAndUpdate(req.params.group_id, req.body, {new: true});
+        const user = await User.findById(req.params.user_id);
+
+        //Check if user exist
+        if (!user) {
+            return res.status(500).json({ message: 'Utilisateur introuvable' });
+        }
         
+        //Check if group exist
+        if (!group) {
+            return res.status(500).json({ message: 'Groupe introuvable' });
+        }
+
         //Check if user is admin    
         if (req.params.user_id !== group.admin_id) {
             return res.status(500).json({ message: 'Vous devez être administrateur pour modifier le groupe' });
@@ -70,6 +91,17 @@ exports.deleteAGroup = async (req, res) => {
     
     try {
         const group = await Group.findByIdAndDelete(req.params.group_id);
+        const user = await User.findById(req.params.user_id);
+
+        //Check if user exist
+        if (!user) {
+            return res.status(500).json({ message: 'Utilisateur introuvable' });
+        }
+
+        //Check if group exist
+        if (!group) {
+            return res.status(500).json({ message: 'Groupe introuvable' });
+        }
 
         //Check if user is admin    
         if (req.params.user_id !== group.admin_id) {
@@ -89,5 +121,11 @@ exports.deleteAGroup = async (req, res) => {
         console.log(error);
         res.json({message: 'erreur serveur'});
     }
+
+}
+
+exports.sendInvitation = async (req, res) => {
+
+    console.log('send')
 
 }
