@@ -169,7 +169,7 @@ exports.sendInvitation = async (req, res) => {
                 return res.status(400).json({ message: "L'utilisateur est déjà dans le groupe" });
             }
         }
-        console.log(payload)
+
         // Check if user is admin
         if (payload.id !== group.admin_id) return res.status(403).json({ message: 'Vous devez être administrateur pour envoyer une invitation' });
 
