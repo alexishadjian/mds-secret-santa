@@ -20,4 +20,8 @@ router
     .put(userController.userUpdate)
     .delete(userController.userDelete)
 
+router
+    .route('/:user_id/santa')
+    .get(userController.getSantaResult)
+
 module.exports = router;

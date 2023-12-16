@@ -6,35 +6,29 @@ const jwtMiddleWare = require('../middlewares/jwtMiddleware');
 
 
 router
-    .route('/:user_id/groups')
+    .route('/')
     .all(jwtMiddleWare.verifyToken)
     .post(groupController.createAGroup)
 
 router
-    .route('/:user_id/groups/:group_id')
+    .route('/:group_id')
     .all(jwtMiddleWare.verifyToken)
-    .delete(groupController.deleteAGroup)
-    .put(groupController.updateAGroup)
-
-router
-    .route('/groups/:group_id')
     .get(groupController.getAGroup)
+    .put(groupController.updateAGroup)
+    .delete(groupController.deleteAGroup)
 
 router
-    .route('/:user_id/groups/:group_id/invite')
-    .all(jwtMiddleWare.verifyToken)
+    .route('/:group_id/invite')
     .post(groupController.sendInvitation)
 
 router
-    .route('/:user_id/groups/:group_id/accept')
+    .route('/:group_id/accept')
     .post(jwtMiddleWare.verifiyTokenInvitation, groupController.acceptInvitation)
 
 router
-    .route('/groups/:group_id/start')
+    .route('/:group_id/start')
+    .all(jwtMiddleWare.verifyToken)
     .post(groupController.startSanta)
-
-// router
-//     .route(':user_id/group/decline')
-//     .put(groupController.userUpdate)
+    
 
 module.exports = router;

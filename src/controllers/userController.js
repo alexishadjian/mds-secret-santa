@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Santa = require('../models/santaModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -102,3 +103,33 @@ exports.getUser = async (req, res) => {
         res.status(500).json({message: 'Erreur serveur'});
     }
 };
+
+exports.getSantaResult = async (req, res) => {
+
+    try {
+
+        const user = await User.findById(req.params.user_id);
+
+        if (!user) return res.status(500).json({message: "Utilisateur non trouvé"});
+
+        const santa = await Santa.find({
+            $or: [
+                { 'sender': req.params.user_id },
+                { 'receiver': req.params.user_id }
+            ]
+        });
+
+        console.log(req.params.user_id)        
+        if (!santa) {
+            return res.status(404).json({ message: "Aucun Santa trouvé avec cet ID." });
+        }
+
+        res.status(200);
+        res.json(santa);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message: "Une erreur s'est produite lors du traitement"})
+    }
+    
+}

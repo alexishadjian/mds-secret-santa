@@ -48,12 +48,12 @@ exports.verifiyTokenInvitation = async (req, res, next) => {
             next();
         } 
         else {
-            res.status(403).json({message: 'Accès interdit: token manquant'});
+            res.status(403).json({message: 'Accès interdit: token '});
         }
     }
     catch (error) {
         console.log(error);
-        res.status(403).json({message: "Accès interdit: token invalide"});
+        res.status(403).json({message: "Accès interdit: token "});
 
     }
 }
