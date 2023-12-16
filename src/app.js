@@ -12,7 +12,7 @@ const userRoute = require('./routes/userRoute');
 const groupRoute = require('./routes/groupRoute');
 
 app.use('/users', userRoute);
-app.use('/', groupRoute);
+app.use('/groups', groupRoute);
 
 
 app.listen(port, () => {
