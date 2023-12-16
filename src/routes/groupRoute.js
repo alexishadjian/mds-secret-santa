@@ -26,6 +26,10 @@ router
     .post(jwtMiddleWare.verifiyTokenInvitation, groupController.acceptInvitation)
 
 router
+    .route('/:group_id/decline')
+    .post(jwtMiddleWare.verifiyTokenInvitation, groupController.declineInvitation)
+
+router
     .route('/:group_id/start')
     .all(jwtMiddleWare.verifyToken)
     .post(groupController.startSanta)

@@ -14,6 +14,8 @@ function generateRandomPassword(length) {
     return password;
 }
 
+
+//Create a group with as admin the logged user
 exports.createAGroup = async (req, res) => {
     try {
         const token = req.headers['authorization'];
@@ -21,7 +23,7 @@ exports.createAGroup = async (req, res) => {
         const user = await User.findById(payload.id);
 
         //Check if user exist
-        if (!user) return res.status(500).json({ message: 'Utilisateur introuvable' });
+        if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
         
         const newGroup = new Group({
             ...req.body,
@@ -44,13 +46,15 @@ exports.createAGroup = async (req, res) => {
     }
 };
 
+
+//Get group informations
 exports.getAGroup = async (req, res) => {
     
     try {
         const group = await Group.findById(req.params.group_id);
 
         //Check if group exist
-        if (!group) return res.status(500).json({ message: 'Groupe introuvable' });
+        if (!group) return res.status(404).json({ message: 'Groupe introuvable' });
 
         if (group) {
             res.status(200);
@@ -68,6 +72,8 @@ exports.getAGroup = async (req, res) => {
 
 }
 
+
+//Change group informations
 exports.updateAGroup = async (req, res) => {
 
     try {
@@ -78,13 +84,13 @@ exports.updateAGroup = async (req, res) => {
         const group = await Group.findByIdAndUpdate(req.params.group_id, req.body, {new: true});
 
         //Check if user exist
-        if (!user) return res.status(500).json({ message: 'Utilisateur introuvable' });
+        if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
         
         //Check if group exist
-        if (!group) return res.status(500).json({ message: 'Groupe introuvable' });
+        if (!group) return res.status(404).json({ message: 'Groupe introuvable' });
 
         //Check if user is admin    
-        if (payload.id !== group.admin_id) return res.status(500).json({ message: 'Vous devez être administrateur pour modifier le groupe' });
+        if (payload.id !== group.admin_id) return res.status(403).json({ message: 'Vous devez être administrateur pour modifier le groupe' });
         res.status(200);
         res.json(group);
     } catch (error) {
@@ -95,6 +101,8 @@ exports.updateAGroup = async (req, res) => {
 
 }
 
+
+//Delete a group
 exports.deleteAGroup = async (req, res) => {
     
     try {
@@ -105,13 +113,13 @@ exports.deleteAGroup = async (req, res) => {
         const group = await Group.findByIdAndDelete(req.params.group_id);
 
         //Check if user exist
-        if (!user) return res.status(500).json({ message: 'Utilisateur introuvable' });
+        if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
 
         //Check if group exist
-        if (!group) return res.status(500).json({ message: 'Groupe introuvable' });
+        if (!group) return res.status(404).json({ message: 'Groupe introuvable' });
 
         //Check if user is admin    
-        if (payload.id !== group.admin_id) return res.status(500).json({ message: 'Vous devez être administrateur pour supprimer le groupe' });
+        if (payload.id !== group.admin_id) return res.status(403).json({ message: 'Vous devez être administrateur pour supprimer le groupe' });
         
         if (group) {
             res.json({message: 'Groupe supprimé'});
@@ -128,6 +136,8 @@ exports.deleteAGroup = async (req, res) => {
     }
 }
 
+
+//Create an invitation token
 exports.sendInvitation = async (req, res) => {
     try {
         const token = req.headers['authorization'];
@@ -138,10 +148,10 @@ exports.sendInvitation = async (req, res) => {
         const userInvited = await User.findOne({ email: req.body.email });
 
         // Check if user exist
-        if (!user) return res.status(500).json({ message: 'Utilisateur introuvable' });
+        if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
 
         // Check if group exist
-        if (!group) return res.status(500).json({ message: 'Groupe introuvable' });
+        if (!group) return res.status(404).json({ message: 'Groupe introuvable' });
 
         // Check if user invited exist
         let userCreated;
@@ -156,12 +166,12 @@ exports.sendInvitation = async (req, res) => {
         } else {
             // Check if user is already in the group
             if (group.members.includes(userInvited?._id)) {
-                return res.status(500).json({ message: "L'utilisateur est déjà dans le groupe" });
+                return res.status(400).json({ message: "L'utilisateur est déjà dans le groupe" });
             }
         }
         console.log(payload)
         // Check if user is admin
-        if (payload.id !== group.admin_id) return res.status(500).json({ message: 'Vous devez être administrateur pour envoyer une invitation' });
+        if (payload.id !== group.admin_id) return res.status(403).json({ message: 'Vous devez être administrateur pour envoyer une invitation' });
 
         const userId = userInvited?._id || userCreated?._id;
         const userEmail = userInvited?.email || userCreated?.email;
@@ -172,6 +182,7 @@ exports.sendInvitation = async (req, res) => {
         };
         const invitationToken = await jwt.sign(userData, process.env.JWT_KEY, { expiresIn: "2h" });
         res.status(200).json({ invitationToken });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Une erreur s'est produite lors du traitement" });
@@ -179,6 +190,7 @@ exports.sendInvitation = async (req, res) => {
 };
 
 
+//Put the logged user in the group
 exports.acceptInvitation = async (req, res) => {
 
     try {
@@ -194,16 +206,16 @@ exports.acceptInvitation = async (req, res) => {
 
 
         //Check if user exist
-        if (!user) return res.status(500).json({ message: 'Utilisateur introuvable' });
+        if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
         
         //Check if group exist
-        if (!group) return res.status(500).json({ message: 'Groupe introuvable' });
+        if (!group) return res.status(404).json({ message: 'Groupe introuvable' });
 
         //Check if this is the right user
-        if (payload.id !== invitationPayload.id ) return res.status(500).json({ message: 'Cette invitation ne vous est pas destinée'})
+        if (payload.id !== invitationPayload.id ) return res.status(403).json({ message: 'Cette invitation ne vous ait pas destinée'})
 
         //Check if user is already in the groupe
-        if (group.members.includes(userInvited.id)) return res.status(500).json({ message: "L'utilisateur est déjà dans le groupe" });
+        if (group.members.includes(userInvited.id)) return res.status(400).json({ message: "L'utilisateur est déjà dans le groupe" });
 
         group.members.push(userInvited);
         userInvited.groups.push(group);
@@ -224,6 +236,39 @@ exports.acceptInvitation = async (req, res) => {
     }
 }
 
+
+//Decline the invitation
+exports.declineInvitation = async (req, res) => {
+
+    try {
+        const group = await Group.findById(req.params.group_id);
+
+        const token = req.headers['authorization'];
+        const payload = jwtMiddleWare.decode(token);
+        const user = await User.findById(payload.id);
+
+        const invitationToken = req.headers['invitation'];
+        const invitationPayload = jwtMiddleWare.decode(invitationToken);
+
+        //Check if user exist
+        if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
+        
+        //Check if group exist
+        if (!group) return res.status(404).json({ message: 'Groupe introuvable' });
+
+        //Check if this is the right user
+        if (payload.id !== invitationPayload.id ) return res.status(403).json({ message: 'Cette invitation ne vous ait pas destinée'})
+        
+        res.status(200).json({ message: 'Invitation refusée' });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message: "Une erreur s'est produite lors du traitement"})
+    }
+}
+
+
+//Make pairs randomly
 exports.startSanta = async (req, res) => {
 
     try {
@@ -233,7 +278,7 @@ exports.startSanta = async (req, res) => {
         const group = await Group.findById(req.params.group_id);
 
         //Check if user is admin    
-        if (payload.id !== group.admin_id) return res.status(500).json({ message: 'Vous devez être administrateur pour supprimer le groupe' });
+        if (payload.id !== group.admin_id) return res.status(403).json({ message: 'Vous devez être administrateur pour supprimer le groupe' });
 
         if (!group || !group.members || group.members.length < 2) return res.status(400).json({ message: "Le groupe n'est pas valide pour le Secret Santa." });
 
